@@ -1,18 +1,14 @@
-# FASL files
 *.fasl
-*.fas
-*.lib
-*.lx64fsl
-*.dx64fsl
-
-# Editor backups
-*~
-\#*\#
-.\#*
-
-# OS files
+*.ufasl
+.cache/
+.sbcl-cache/
+*.o
+*.so
+*.a
+*.dylib
 .DS_Store
-Thumbs.db
-
-# Build artifacts
-*.core
+*~
+*.swp
+*.swo
+#*
+.#*

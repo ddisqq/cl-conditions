@@ -1,6 +1,15 @@
-Copyright (c) 2024-2026 Parkian Company LLC.
-All rights reserved.
+cl-conditions
+Copyright (c) 2024-2026 Parkian Company LLC. All rights reserved.
+
+This software was originally developed as part of the CLPIC project
+(Common Lisp P2P Intellectual Property Chain) and has been extracted
+as a standalone library for broader use.
+
+Extracted modules:
+  - src/conditions/package.lisp
 
 This product includes software developed by Parkian Company LLC.
 
-For licensing information, see the LICENSE file in this repository.
+Authors and Copyright Holders:
+  - ddisqq
+  - Parkian Company LLC

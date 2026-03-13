@@ -1,90 +1,75 @@
 # cl-conditions
 
-Extended condition/restart framework for Common Lisp.
+Canonical condition and exception hierarchy for Common Lisp applications.
 
 ## Features
 
-- `define-condition-hierarchy` - Define related conditions together
-- `with-condition-handlers` - Cleaner handler syntax
-- `with-restarts` - Simplified restart establishment
-- Standard restarts: retry, skip, use-value
-- Condition chaining and nesting
-- Condition logging and reporting
-
-## Installation
-
-```lisp
-(asdf:load-system :cl-conditions)
-```
+- **Comprehensive error hierarchy** - 70+ condition types covering crypto, network, consensus, storage, validation, wallet, blockchain, RPC, and more
+- **Structured error information** - All conditions include message, code, and context slots for rich error handling
+- **Domain-specific conditions** - Specialized error types for cryptography, blockchain, consensus, and networking
+- **Pure Common Lisp** - Zero external dependencies, SBCL-compatible
+- **Well-documented** - Full docstrings on all exported conditions
 
 ## Usage
 
 ```lisp
+(asdf:load-system :cl-conditions)
 (use-package :cl-conditions)
 
-;; Define a condition hierarchy
-(define-condition-hierarchy validation-error (error)
-  ((field :initarg :field :reader error-field))
-  (:children
-   (missing-field-error ()
-     ((name :initarg :name :reader missing-field-name)))
-   (invalid-value-error ()
-     ((value :initarg :value :reader invalid-value)
-      (expected :initarg :expected :reader expected-type)))))
+;; Signal a validation error with context
+(error 'validation-error
+       :message "Invalid transaction height"
+       :field "height"
+       :value -1
+       :expected ">= 0")
 
-;; Use with-condition-handlers for cleaner syntax
-(with-condition-handlers
-    ((missing-field-error (c)
-       (format t "Missing: ~A~%" (missing-field-name c))
-       (invoke-restart 'use-value nil))
-     (invalid-value-error (c)
-       (invoke-restart 'skip)))
-  (validate-data input))
+;; Catch and handle cryptographic errors
+(handler-case (verify-signature sig pubkey)
+  (crypto-error (e)
+    (format t "Crypto failed: ~A~%" (error-message e)))
+  (invalid-signature (e)
+    (format t "Bad signature: ~A~%" (error-signature e))))
 
-;; Establish restarts easily
-(with-restarts ((retry () :report "Try again" (process-item item))
-                (skip () :report "Skip this item" nil)
-                (use-value (v) :report "Use different value" v))
-  (process-item item))
-
-;; Condition chaining
-(handler-bind ((error (lambda (c)
-                        (signal-chain 'wrapper-error c))))
-  (risky-operation))
-
-;; Logging conditions
-(with-condition-logging (:stream *error-output* :level :warn)
-  (operation-that-might-warn))
+;; Catch errors by hierarchy
+(handler-case (process-block block)
+  (blockchain-error (e)
+    (log-blockchain-error e))
+  (network-error (e)
+    (retry-with-backoff e))
+  (cl-conditions-error (e)
+    (handle-generic-error e)))
 ```
 
-## API
+## Condition Hierarchy
 
-### Defining Conditions
+### Base Conditions
+- `cl-conditions-error` - Base error condition
+- `cl-conditions-warning` - Base warning condition
 
-- `define-condition-hierarchy name (parents) slots &rest options`
+### Domain-Specific Categories
+- **Crypto**: `crypto-error`, `invalid-signature`, `invalid-key`, `verification-failed`, etc.
+- **Network**: `network-error`, `connection-failed`, `timeout-error`, `peer-error`, `protocol-error`
+- **Consensus**: `consensus-error`, `invalid-block`, `invalid-attestation`, `slashing-detected`
+- **Storage**: `storage-error`, `not-found`, `corruption-detected`, `database-error`
+- **Validation**: `validation-error`, `invalid-format`, `out-of-range`, `type-validation-error`
+- **Wallet**: `wallet-error`, `insufficient-funds`, `wallet-locked`, `key-derivation-error`
+- **Blockchain**: `blockchain-error`, `fork-resolution-error`, `double-spend`, `utxo-error`
+- **RPC**: `rpc-error`, `rpc-authentication-error`, `rpc-rate-limit-error`
 
-### Handling Conditions
+## API Reference
 
-- `with-condition-handlers handlers &body body`
-- `with-restarts restarts &body body`
-- `invoke-restart-if-bound name &rest args`
+### Error Accessors
 
-### Chaining
+- `error-message` - Human-readable error description
+- `error-code` - Numeric or symbolic error code
+- `error-context` - Additional context data (alist or plist)
+- `warning-message` - Warning message
+- `warning-context` - Warning context
 
-- `signal-chain condition cause` - Signal with cause chain
-- `condition-cause condition` - Get cause of chained condition
+### Helper Functions
 
-### Logging
-
-- `with-condition-logging options &body body`
-- `condition-report condition stream` - Format condition
-
-### Standard Restarts
-
-- `retry` - Retry the operation
-- `skip` - Skip current item, continue
-- `use-value value` - Use alternative value
-- `abort` - Abort operation entirely
+- `(signal-error condition-type format-string &rest args)` - Signal an error with formatted message
+- `(warn-condition condition-type format-string &rest args)` - Issue a warning with formatted message
 
 ## License
 
