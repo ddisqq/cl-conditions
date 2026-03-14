@@ -8,7 +8,7 @@
   :version "0.1.0"
   :serial t
   :components ((:file "src/conditions"))
-  :in-order-to ((test-op (test-op "cl-conditions/test"))))
+  :in-order-to ((asdf:test-op (test-op "cl-conditions/test"))))
 
 (asdf:defsystem #:cl-conditions/test
   :description "Tests for cl-conditions"
@@ -16,7 +16,7 @@
   :serial t
   :components ((:module "test"
                 :components ((:file "test-conditions"))))
-  :perform (test-op (o c)
+  :perform (asdf:test-op (o c)
              (let ((result (uiop:symbol-call :cl-conditions.test :run-tests)))
                (unless result
                  (error "Tests failed")))))
