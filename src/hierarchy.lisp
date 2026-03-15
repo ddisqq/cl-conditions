@@ -1,9 +1,9 @@
 ;; Copyright (c) 2024-2026 Parkian Company LLC. All rights reserved.
-;; SPDX-License-Identifier: BSD-3-Clause
+;; SPDX-License-Identifier: Apache-2.0
 
 ;;;; hierarchy.lisp - Condition hierarchy definition
 ;;;; Copyright (c) 2024-2026 Parkian Company LLC
-;;;; License: BSD-3-Clause
+;;;; License: Apache-2.0
 
 (in-package #:cl-conditions)
 

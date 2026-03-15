@@ -4,7 +4,7 @@
 (asdf:defsystem #:cl-conditions
   :description "Canonical condition and exception hierarchy for Common Lisp"
   :author "Parkian Company LLC"
-  :license "BSD-3-Clause"
+  :license "Apache-2.0"
   :version "0.1.0"
   :serial t
   :components ((:file "src/conditions"))
